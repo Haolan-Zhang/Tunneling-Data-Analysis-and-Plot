@@ -63,7 +63,7 @@ class NewDataDownloader(DataDownloader):
         return data
 
 
-def plot_sigle_ring_figer(data, base_data_num: int = 3, y_label_index=0):
+def plot_sigle_ring_figer(data, base_data_num: int = 3, y_label_index=2):
     data
     figsize_y = (data.shape[1] - base_data_num) * 3
     figsize_x = 15
@@ -71,23 +71,29 @@ def plot_sigle_ring_figer(data, base_data_num: int = 3, y_label_index=0):
     plot_num = data.shape[1] - base_data_num
     fig, axs = plt.subplots(plot_num, 1, sharex=True, figsize=(figsize_x, figsize_y))
     plt.suptitle(f'第{ring_num}环', fontsize=25, x=0.01, y=0.98, ha='left')
-    x_label = data.iloc[:, y_label_index]
+    x_label_name = data.iloc[:, y_label_index]
+    calibration = int(data.shape[0]/10)
+    x_ticks = []
+    label_name = []
+    for i in range(11):
+        x_ticks.append(calibration*i)
+        label_name.append(x_label_name[calibration*i])
+
     x_label = pd.Series(np.arange(data.shape[0]),name = 'index')
+    plt.xticks(x_ticks,label_name)
     for i in range(plot_num):
         sub_data = data.iloc[:, i + base_data_num]
         axs[i].plot(x_label, sub_data)
         axs[i].set_ylabel(sub_data.name)
     plt.subplots_adjust(hspace=0)
-    plt.xlabel(x_label.name)
+    plt.xlabel(x_label_name.name)
     plt.show()
     return
 
 
 if __name__ == "__main__":
-    data_loader = NewDataDownloader("5-2-3")
-    for i in range(264,274):
-        ring_data = data_loader.return_single_ring_tunneling_data(i, ['螺旋机闸门开度', '正面土压力上',
-                                                                        '总推力','螺旋机转速给定',
-                                                                        '扫描器排土量（环）','螺旋机扭矩',
-                                                                        '推进速度上'])
+    data_loader = NewDataDownloader("5-2-4")
+    para_list = ['刀盘扭矩','推进速度上','推进速度给定','螺旋机闸门开度', '螺旋机转速给定','螺旋机扭矩','正面土压力上']
+    for i in range(597,598):
+        ring_data = data_loader.return_single_ring_tunneling_data(i,para_list)
         plot_sigle_ring_figer(ring_data)
